@@ -43,3 +43,10 @@ test('Checkout branch if it\'s the only match', async t => {
   executeInRepo('FO')
   t.is(getBranchName(), 'FOO')
 })
+
+test('Throws error if git is not clean', async t => {
+  createRepo()
+  exe(`cd tmp && rm test`)
+  const { stdout } = executeInRepo('FOO')
+  t.is(stdout, 'Please commit any changes in your repo before using this tool')
+})

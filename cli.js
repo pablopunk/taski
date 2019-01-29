@@ -15,8 +15,8 @@ async function notGit () {
 }
 
 async function gitNotClean () {
-  return execa('git', ['diff', '--cached', '--exit-code'])
-    .then(_ => false)
+  return execa('git', ['diff', '--exit-code'])
+    .then(({ code }) => code !== 0)
     .catch(_ => true)
 }
 
