@@ -68,15 +68,6 @@ function help () {
 }
 
 async function cli (argv) {
-  if (await notGit()) {
-    throw new Error('This is not a git repo')
-  }
-  if (await gitNotClean()) {
-    throw new Error(
-      `Please commit any changes in your repo before using this tool`
-    )
-  }
-
   const { _: commands } = mri(argv)
 
   switch (commands[0]) {
@@ -89,6 +80,16 @@ async function cli (argv) {
       help()
       break
     default:
+      if (await notGit()) {
+        throw new Error('This is not a git repo')
+      }
+
+      if (await gitNotClean()) {
+        throw new Error(
+          `Please commit any changes in your repo before using this tool`
+        )
+      }
+
       if (await branchExists(commands[0])) {
         triggerTaskStart(commands[0])
         break
