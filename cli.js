@@ -39,6 +39,7 @@ async function getBranchList (fuzzy = '') {
   const branches = stdout
     .split('\n') // each line is a branch
     .map(b => b.replace(/^../, '')) // two first characters are not int the name
+    .filter(b => !b.startsWith('remotes/')) // remove remotes
     .filter(b => !!b) // remove '' when there are no branches
     .filter(b => b.includes(fuzzy)) // fuzzy search
 
