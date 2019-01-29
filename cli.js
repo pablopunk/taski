@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { name: pkgName, version: pkgVersion } = require('./package.json')
 const mri = require('mri')
 const execa = require('execa')
