@@ -1,0 +1,47 @@
+{
+  "name": "taski",
+  "description": "Simplify your git workflow with tasks",
+  "version": "1.0.0",
+  "author": "Pablo Varela <pablovarela182@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/pablopunk/taski/issues",
+    "email": "pablovarela182@gmail.com"
+  },
+  "contributors": [
+    "Pablo Varela <pablovarela182@gmail.com>"
+  ],
+  "dependencies": {
+    "execa": "^1.0.0",
+    "inquirer": "^6.2.1",
+    "mri": "^1.1.4"
+  },
+  "devDependencies": {
+    "myass": "*",
+    "standard": "*"
+  },
+  "homepage": "https://github.com/pablopunk/taski",
+  "keywords": [
+    "taski",
+    "tasks",
+    "git",
+    "project",
+    "workflow",
+    "productivity",
+    "tools",
+    "develop",
+    "cli"
+  ],
+  "license": "MIT",
+  "main": "cli.js",
+  "bin": {
+    "taski": "cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pablopunk/taski"
+  },
+  "scripts": {
+    "test": "npm run lint && myass",
+    "lint": "standard"
+  }
+}
