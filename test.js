@@ -50,3 +50,11 @@ test('Throws error if git is not clean', async t => {
   const { stdout } = executeInRepo('FOO')
   t.is(stdout, 'Please commit any changes in your repo before using this tool')
 })
+
+test('Throws error outside of repo', async t => {
+  const { stdout } = exe(`
+    rm -rf /tmp/taski-no-repo &&
+    mkdir /tmp/taski-no-repo &&
+    cd /tmp/taski-no-repo && node ${__dirname}`)
+  t.is(stdout, 'This is not a git repo')
+})

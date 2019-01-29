@@ -9,9 +9,9 @@ const info = msg => console.log(chalk.green(msg))
 const error = msg => console.log(chalk.red(msg))
 
 async function notGit () {
-  const { code } = await execa('git', ['rev-parse', '--is-inside-work-tree'])
-
-  return code !== 0
+  return execa('git', ['rev-parse', '--is-inside-work-tree'])
+    .then(_ => false)
+    .catch(_ => true)
 }
 
 async function gitNotClean () {
