@@ -12,7 +12,9 @@ const error = msg => console.log(chalk.red(msg))
 const PROTECT = 'master'
 
 async function getCurrentBranch () {
-  return execa('git', ['symbolic-ref', '--short', 'HEAD']).then(res => res.stdout)
+  return execa('git', ['symbolic-ref', '--short', 'HEAD']).then(
+    res => res.stdout
+  )
 }
 
 async function notGit () {
@@ -63,9 +65,50 @@ async function getBranchList (fuzzy = '') {
   return branches
 }
 
+const invalidSubstrings = [
+  '..',
+  ' ',
+  '~',
+  '^',
+  ':',
+  '?',
+  '*',
+  '[',
+  '//',
+  '@{',
+  '\\'
+]
+
+const cantEndWithSubstrings = ['.', '/']
+
+const cantStartWithSubstrings = ['/']
+
+function isNameValid (name) {
+  for (let notAllowed of invalidSubstrings) {
+    if (name.includes(notAllowed)) {
+      return false
+    }
+  }
+  for (let notAllowed of cantEndWithSubstrings) {
+    if (name[name.length - 1] === notAllowed) {
+      return false
+    }
+  }
+  for (let notAllowed of cantStartWithSubstrings) {
+    if (name.startsWith(notAllowed)) {
+      return false
+    }
+  }
+  return true
+}
+
 async function triggerTaskStart (name) {
   const doesBranchExist = await branchExists(name)
-  startTask(name, !doesBranchExist)
+  if (!isNameValid(name)) {
+    error('Invalid name')
+    return
+  }
+  await startTask(name, !doesBranchExist)
   remark(
     doesBranchExist
       ? `Branch exists, checking out now...`
@@ -111,21 +154,27 @@ async function cli (argv) {
       const branches = await getBranchList(commands[0])
 
       if (commands[0] === 'delete') {
-        if (commands[1]) { // delete specific
+        if (commands[1]) {
+          // delete specific
           const currentBranch = await getCurrentBranch()
           if (await branchExists(commands[1])) {
             if (currentBranch === commands[1]) {
-              throw new Error(`Can't delete branch ${currentBranch} if you're on it`)
+              throw new Error(
+                `Can't delete branch ${currentBranch} if you're on it`
+              )
             }
             deleteTask(commands[1])
             remark(`Deleted branch ${commands[1]}`)
-          } else { // search parameter and delete all matches
+          } else {
+            // search parameter and delete all matches
             const matches = await getBranchList(commands[1])
             if (matches.length === 0) {
               throw new Error(`No results for search: '${commands[1]}'`)
             }
             if (matches.includes(currentBranch)) {
-              throw new Error(`Can't delete branch ${currentBranch} if you're on it`)
+              throw new Error(
+                `Can't delete branch ${currentBranch} if you're on it`
+              )
             }
             info('Will be deleting the following branches:')
             remark(matches.join('\n'))
@@ -133,7 +182,7 @@ async function cli (argv) {
               .prompt({
                 name: 'Are you sure?',
                 type: 'list',
-                choices: [ 'y', 'n' ]
+                choices: ['y', 'n']
               })
               .then(({ 'Are you sure?': answer }) => {
                 if (answer === 'y') {
@@ -142,7 +191,8 @@ async function cli (argv) {
                 }
               })
           }
-        } else { // show list to choose
+        } else {
+          // show list to choose
           const allBranches = await getBranchList()
 
           inquirer // ask for confirmation
