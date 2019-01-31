@@ -86,3 +86,29 @@ test('No results for non-existent branch', async t => {
   const { stdout } = executeInRepo('delete FOO')
   t.is(stdout, 'No results for search: \'FOO\'')
 })
+
+// from `man git check-ref-format`
+const invalidNames = [
+  'two..dots',
+  'spaces spaces',
+  'this~',
+  'this^',
+  'this:',
+  'this?',
+  'this*',
+  'this[',
+  'two//slashes',
+  'this@{',
+  'this\\\\',
+  'endwithdot.',
+  'endwithslash/',
+  '/start'
+]
+
+test('Throws error for invalid branch names', async t => {
+  createRepo()
+  for (let invalid of invalidNames) {
+    const { stdout } = executeInRepo(`"${invalid}"`)
+    t.is(stdout, 'Invalid name')
+  }
+})
