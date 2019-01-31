@@ -164,7 +164,6 @@ async function cli (argv) {
         break
       }
 
-
       // No branches, start one with provided name
       if (branches.length === 0) {
         triggerTaskStart(commands[0])
