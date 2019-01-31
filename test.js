@@ -21,6 +21,11 @@ const getBranchName = _ => exe(`
   git symbolic-ref --short HEAD
 `).stdout
 
+const listBranches = _ => exe(`
+  cd tmp &&
+  git branch -a
+`).stdout.split('\n').map(b => b.replace(/^../, ''))
+
 test('Starts a task as a new branch', t => {
   const randomName = parseInt((Math.random() * 1000)).toString()
   createRepo()
@@ -57,4 +62,27 @@ test('Throws error outside of repo', async t => {
     mkdir /tmp/taski-no-repo &&
     cd /tmp/taski-no-repo && node ${__dirname}`)
   t.is(stdout, 'This is not a git repo')
+})
+
+test('Can delete branch', async t => {
+  createRepo()
+  executeInRepo('FOO')
+  executeInRepo('master')
+  executeInRepo('delete FOO')
+  const branches = listBranches()
+  t.is(branches, ['master'])
+})
+
+test('Branch master is protected', async t => {
+  createRepo()
+  executeInRepo('FOO')
+  executeInRepo('delete master')
+  const branches = listBranches()
+  t.is(branches, ['FOO', 'master'])
+})
+
+test('No results for non-existent branch', async t => {
+  createRepo()
+  const { stdout } = executeInRepo('delete FOO')
+  t.is(stdout, 'No results for search: \'FOO\'')
 })

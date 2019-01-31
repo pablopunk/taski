@@ -5,8 +5,15 @@ const execa = require('execa')
 const inquirer = require('inquirer')
 const chalk = require('chalk')
 
-const info = msg => console.log(chalk.green(msg))
+const info = console.log
+const remark = msg => console.log(chalk.green(msg))
 const error = msg => console.log(chalk.red(msg))
+
+const PROTECT = 'master'
+
+async function getCurrentBranch () {
+  return execa('git', ['symbolic-ref', '--short', 'HEAD']).then(res => res.stdout)
+}
 
 async function notGit () {
   return execa('git', ['rev-parse', '--is-inside-work-tree'])
@@ -24,6 +31,16 @@ async function branchExists (name) {
   return execa('git', ['show-ref', '--verify', '--quiet', `refs/heads/${name}`])
     .then(_ => true)
     .catch(_ => false)
+}
+
+async function deleteTask (name) {
+  if (name === PROTECT) {
+    error(`Branch ${name} is protected`)
+    return
+  }
+  return execa('git', ['branch', '-d', name]).catch(err => {
+    throw new Error(`Something went wrong deleting the branch\n${err.message}`)
+  })
 }
 
 async function startTask (name, isNew = false) {
@@ -49,7 +66,7 @@ async function getBranchList (fuzzy = '') {
 async function triggerTaskStart (name) {
   const doesBranchExist = await branchExists(name)
   startTask(name, !doesBranchExist)
-  info(
+  remark(
     doesBranchExist
       ? `Branch exists, checking out now...`
       : `Created task ${name}`
@@ -91,12 +108,62 @@ async function cli (argv) {
         )
       }
 
+      const branches = await getBranchList(commands[0])
+
+      if (commands[0] === 'delete') {
+        if (commands[1]) { // delete specific
+          const currentBranch = await getCurrentBranch()
+          if (await branchExists(commands[1])) {
+            if (currentBranch === commands[1]) {
+              throw new Error(`Can't delete branch ${currentBranch} if you're on it`)
+            }
+            deleteTask(commands[1])
+            remark(`Deleted branch ${commands[1]}`)
+          } else { // search parameter and delete all matches
+            const matches = await getBranchList(commands[1])
+            if (matches.length === 0) {
+              throw new Error(`No results for search: '${commands[1]}'`)
+            }
+            if (matches.includes(currentBranch)) {
+              throw new Error(`Can't delete branch ${currentBranch} if you're on it`)
+            }
+            info('Will be deleting the following branches:')
+            remark(matches.join('\n'))
+            inquirer // ask for confirmation
+              .prompt({
+                name: 'Are you sure?',
+                type: 'list',
+                choices: [ 'y', 'n' ]
+              })
+              .then(({ 'Are you sure?': answer }) => {
+                if (answer === 'y') {
+                  matches.forEach(deleteTask)
+                  remark(`Deleted`)
+                }
+              })
+          }
+        } else { // show list to choose
+          const allBranches = await getBranchList()
+
+          inquirer // ask for confirmation
+            .prompt({
+              name: 'Choose branch to delete',
+              type: 'list',
+              choices: allBranches
+            })
+            .then(({ 'Choose branch to delete': answer }) => {
+              deleteTask(answer)
+            })
+        }
+
+        break
+      }
+
       if (await branchExists(commands[0])) {
         triggerTaskStart(commands[0])
         break
       }
 
-      const branches = await getBranchList(commands[0])
 
       // No branches, start one with provided name
       if (branches.length === 0) {
