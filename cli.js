@@ -3,11 +3,11 @@ const { name: pkgName, version: pkgVersion } = require('./package.json')
 const mri = require('mri')
 const execa = require('execa')
 const inquirer = require('inquirer')
-const chalk = require('chalk')
+const kleur = require('kleur')
 
 const info = console.log
-const remark = msg => console.log(chalk.green(msg))
-const error = msg => console.log(chalk.red(msg))
+const remark = msg => console.log(kleur.green(msg))
+const error = msg => console.log(kleur.red(msg))
 
 const PROTECT = 'master'
 

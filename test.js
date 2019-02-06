@@ -53,7 +53,7 @@ test('Throws error if git is not clean', async t => {
   createRepo()
   exe(`cd tmp && rm test`)
   const { stdout } = executeInRepo('FOO')
-  t.is(stdout, 'Please commit any changes in your repo before using this tool')
+  t.regex(stdout, /please commit/i)
 })
 
 test('Throws error outside of repo', async t => {
@@ -61,7 +61,7 @@ test('Throws error outside of repo', async t => {
     rm -rf /tmp/taski-no-repo &&
     mkdir /tmp/taski-no-repo &&
     cd /tmp/taski-no-repo && node ${__dirname}`)
-  t.is(stdout, 'This is not a git repo')
+  t.regex(stdout, /not a git repo/)
 })
 
 test('Can delete branch', async t => {
@@ -84,7 +84,7 @@ test('Branch master is protected', async t => {
 test('No results for non-existent branch', async t => {
   createRepo()
   const { stdout } = executeInRepo('delete FOO')
-  t.is(stdout, 'No results for search: \'FOO\'')
+  t.regex(stdout, /no results/i)
 })
 
 // from `man git check-ref-format`
@@ -109,6 +109,6 @@ test('Throws error for invalid branch names', async t => {
   createRepo()
   for (let invalid of invalidNames) {
     const { stdout } = executeInRepo(`"${invalid}"`)
-    t.is(stdout, 'Invalid name')
+    t.regex(stdout, /invalid name/i)
   }
 })

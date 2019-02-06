@@ -13,10 +13,11 @@
   "dependencies": {
     "execa": "^1.0.0",
     "inquirer": "^6.2.1",
+    "kleur": "^3.0.1",
     "mri": "^1.1.4"
   },
   "devDependencies": {
-    "myass": "*",
+    "myass": "^1.3.0",
     "standard": "*"
   },
   "homepage": "https://github.com/pablopunk/taski",
