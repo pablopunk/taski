@@ -1,18 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 596 420" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
-    <g transform="matrix(1,0,0,1,282.415,218.837)">
-        <g id="aski">
-            <text x="0px" y="0px" style="font-family:'DankMono-Italic', 'Dank Mono';font-style:italic;font-size:17.621px;fill:rgb(51,51,51);">aski</text>
-        </g>
-    </g>
-    <g id="T" transform="matrix(1.18948,0,0,1.18948,-53.1581,-38.9216)">
-        <circle id="path10" cx="270.397" cy="199.267" r="3.028" style="fill:rgb(38,38,38);stroke:rgb(44,210,171);stroke-width:1.17px;"/>
-        <circle id="circle859" cx="278.011" cy="220.261" r="3.028" style="fill:rgb(38,38,38);stroke:rgb(44,210,171);stroke-width:1.17px;"/>
-        <path id="path847" d="M270.937,199.265L278.016,199.265L278.016,219.549" style="fill:none;stroke:rgb(38,38,38);stroke-width:2.38px;stroke-linecap:square;stroke-linejoin:round;"/>
-        <rect id="rect863" x="276.089" y="198.077" width="8.165" height="2.376" style="fill:rgb(38,38,38);"/>
-        <g id="path865" transform="matrix(0.01913,0.0472765,-0.0472765,0.01913,294.345,175.59)">
-            <path d="M403.051,369.896L314.478,334.059L389.8,275.272L403.051,369.896Z" style="fill:rgb(38,38,38);fill-rule:nonzero;stroke:rgb(38,38,38);stroke-width:30.28px;stroke-linecap:square;stroke-linejoin:round;"/>
-        </g>
-    </g>
-</svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="100%" height="100%" viewBox="0 0 596 120" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;"><text id="aski" x="282.415px" y="68.837px" style="font-family:'DankMono-Italic', 'Dank Mono';font-style:italic;font-size:17.621px;fill:#333;">aski</text><g id="T"><circle id="path10" cx="268.474" cy="48.103" r="3.602" style="fill:#262626;stroke:#2cd2ab;stroke-width:1.39px;"/><circle id="circle859" cx="277.53" cy="73.074" r="3.602" style="fill:#262626;stroke:#2cd2ab;stroke-width:1.39px;"/><path id="path847" d="M269.116,48.1l8.42,0l0,24.128" style="fill:none;stroke:#262626;stroke-width:2.83px;stroke-linecap:square;stroke-linejoin:round;"/><rect id="rect863" x="275.244" y="46.687" width="9.712" height="2.826" style="fill:#262626;"/><path id="path865" d="M285.33,51.021l0,-5.796l5.019,2.898l-5.019,2.898Z" style="fill:#262626;fill-rule:nonzero;stroke:#262626;stroke-width:1.84px;stroke-linecap:square;stroke-linejoin:round;"/></g></svg>
