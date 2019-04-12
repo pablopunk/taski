@@ -29,6 +29,19 @@ npm install -g taski
 
 ```bash
 $ taski help
+
+  [help]
+  Start a task:
+      taski MY_TASK
+  List and choose from all tasks:
+      taski
+  List tasks containing a string (starts task if no results)
+      taski MY
+  Delete an existing task called 'foo' (or all containing foo - requires confirmation)
+      taski delete foo
+  Delete from list
+      taski delete
+
 ```
 
 

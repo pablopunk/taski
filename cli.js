@@ -123,7 +123,7 @@ function help () {
       ${pkgName} MY_TASK
   List and choose from all tasks:
       ${pkgName}
-  List tasks containing a string or start task if it's the only one
+  List tasks containing a string (starts task if no results)
       ${pkgName} MY
   Delete an existing task called 'foo' (or all containing foo - requires confirmation)
       ${pkgName} delete foo
