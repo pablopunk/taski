@@ -1,6 +1,8 @@
 const test = require('myass')
 const { shellSync: exe } = require('execa')
 
+// HELPER FUNCTIONS
+
 const createRepo = _ => exe(`
   rm -rf tmp &&
   mkdir tmp &&
@@ -26,6 +28,8 @@ const listBranches = _ => exe(`
   git branch -a
 `).stdout.split('\n').map(b => b.replace(/^../, ''))
 
+// TESTS
+
 test('Starts a task as a new branch', t => {
   const randomName = parseInt((Math.random() * 1000)).toString()
   createRepo()
@@ -38,14 +42,6 @@ test('Checkout branch if it exists', t => {
   executeInRepo('FOO')
   exe(`cd tmp && git checkout master`)
   executeInRepo('FOO')
-  t.is(getBranchName(), 'FOO')
-})
-
-test('Checkout branch if it\'s the only match', async t => {
-  createRepo()
-  executeInRepo('FOO')
-  exe(`cd tmp && git checkout master`)
-  executeInRepo('FO')
   t.is(getBranchName(), 'FOO')
 })
 

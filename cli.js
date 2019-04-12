@@ -224,12 +224,6 @@ async function cli (argv) {
         break
       }
 
-      // 1 branch with current search, start it
-      if (commands[0] && branches.length === 1) {
-        triggerTaskStart(branches[0])
-        break
-      }
-
       inquirer
         .prompt({
           name: 'Choose task',
