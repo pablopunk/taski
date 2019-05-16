@@ -68,7 +68,7 @@ async function getBranchList (fuzzy = '') {
       }
       return [ ...acc, curr ]
     }, [])
-    .filter(b => !!b) // remove '' when there are no branches
+    .filter(Boolean) // remove '' when there are no branches
     .filter(b => b.includes(fuzzy)) // fuzzy search
 
   return branches
