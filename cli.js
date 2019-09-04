@@ -11,31 +11,31 @@ const error = msg => console.log(kleur.red(msg))
 
 const PROTECT = 'master'
 
-async function getCurrentBranch () {
+async function getCurrentBranch() {
   return execa('git', ['symbolic-ref', '--short', 'HEAD']).then(
     res => res.stdout
   )
 }
 
-async function notGit () {
+async function notGit() {
   return execa('git', ['rev-parse', '--is-inside-work-tree'])
     .then(_ => false)
     .catch(_ => true)
 }
 
-async function gitNotClean () {
+async function gitNotClean() {
   return execa('git', ['diff', '--exit-code'])
     .then(({ code }) => code !== 0)
     .catch(_ => true)
 }
 
-async function branchExists (name) {
+async function branchExists(name) {
   return execa('git', ['show-ref', '--verify', '--quiet', `refs/heads/${name}`])
     .then(_ => true)
     .catch(_ => false)
 }
 
-async function deleteTask (name) {
+async function deleteTask(name) {
   if (name === PROTECT) {
     error(`Branch ${name} is protected`)
     return
@@ -45,7 +45,7 @@ async function deleteTask (name) {
   })
 }
 
-async function startTask (name, isNew = false) {
+async function startTask(name, isNew = false) {
   const args = isNew ? ['checkout', '-b', name] : ['checkout', name]
 
   return execa('git', args).catch(err => {
@@ -53,20 +53,18 @@ async function startTask (name, isNew = false) {
   })
 }
 
-async function getBranchList (fuzzy = '') {
+async function getBranchList(fuzzy = '') {
   const { stdout } = await execa('git', ['branch', '-a'])
   const branches = stdout
     .split('\n') // each line is a branch
     .map(b => b.replace(/^../, '')) // two first characters are not in the name
-    .map(b => b.startsWith('remote')
-      ? b.split('/').pop()
-      : b
-    )
-    .reduce((acc, curr) => { // remove duplicates (caused by previous map)
+    .map(b => (b.startsWith('remote') ? b.split('/').pop() : b))
+    .reduce((acc, curr) => {
+      // remove duplicates (caused by previous map)
       if (acc.includes(curr)) {
         return acc
       }
-      return [ ...acc, curr ]
+      return [...acc, curr]
     }, [])
     .filter(Boolean) // remove '' when there are no branches
     .filter(b => b.includes(fuzzy)) // fuzzy search
@@ -92,7 +90,7 @@ const cantEndWithSubstrings = ['.', '/']
 
 const cantStartWithSubstrings = ['/']
 
-function isNameValid (name) {
+function isNameValid(name) {
   for (let notAllowed of invalidSubstrings) {
     if (name.includes(notAllowed)) {
       return false
@@ -111,7 +109,7 @@ function isNameValid (name) {
   return true
 }
 
-async function triggerTaskStart (name) {
+async function triggerTaskStart(name) {
   const doesBranchExist = await branchExists(name)
   if (!isNameValid(name)) {
     error('Invalid name')
@@ -125,7 +123,7 @@ async function triggerTaskStart (name) {
   )
 }
 
-function help () {
+function help() {
   info(`
   [help]
   Start a task:
@@ -141,7 +139,7 @@ function help () {
   `)
 }
 
-async function cli (argv) {
+async function cli(argv) {
   const { _: commands } = mri(argv)
 
   switch (commands[0]) {
@@ -227,12 +225,21 @@ async function cli (argv) {
         break
       }
 
-      // No branches, start one with provided name
+      // No branches, ask user to start a new one
       if (branches.length === 0) {
-        triggerTaskStart(commands[0])
-        break
+        const question = `Create task '${commands[0]}'?`
+        const { [question]: answer } = await inquirer.prompt({
+          name: question,
+          type: 'list',
+          choices: ['y', 'n']
+        })
+        if (answer === 'y') {
+          triggerTaskStart(commands[0])
+        }
+        break // never continue
       }
 
+      // Choosing an existing branch
       inquirer
         .prompt({
           name: 'Choose task',
@@ -241,7 +248,7 @@ async function cli (argv) {
         })
         .then(({ 'Choose task': answer }) => {
           if (answer === 'Create new task') {
-            info(`Create new task with '${pkgName} start <task-name>'`)
+            info(`Create new task with '${pkgName} <task-name>'`)
           } else {
             triggerTaskStart(answer)
           }

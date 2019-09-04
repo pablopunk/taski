@@ -17,8 +17,9 @@
     "mri": "^1.1.4"
   },
   "devDependencies": {
-    "myass": "^1.3.0",
-    "standard": "*"
+    "husky": "*",
+    "prettier": "*",
+    "pretty-quick": "*"
   },
   "homepage": "https://github.com/pablopunk/taski",
   "keywords": [
@@ -41,8 +42,15 @@
     "type": "git",
     "url": "https://github.com/pablopunk/taski"
   },
-  "scripts": {
-    "test": "npm run lint && myass",
-    "lint": "standard"
+  "scripts": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2
   }
 }
