@@ -12,7 +12,7 @@
 ![logo](./res/taski.svg)
 
 <p align="center">
-  <a href="https://asciinema.org/a/QwesE5OXdVNhu6qDJGuaDkZkj" target="_blank"><img src="https://asciinema.org/a/QwesE5OXdVNhu6qDJGuaDkZkj.svg" /></a>
+  <a href="https://asciinema.org/a/YArtoa00PICWDPYq1DQXMX4zp" target="_blank"><img src="https://asciinema.org/a/YArtoa00PICWDPYq1DQXMX4zp.svg" /></a>
 </p>
 
 ## Install
