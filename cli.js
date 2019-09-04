@@ -126,9 +126,9 @@ async function triggerTaskStart(name) {
 function help() {
   info(`
   [help]
-  Start a task:
+  Start a task (requires confirmation)
       ${pkgName} MY_TASK
-  List and choose from all tasks:
+  List and choose from all tasks
       ${pkgName}
   List tasks containing a string (starts task if no results)
       ${pkgName} MY
