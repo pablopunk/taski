@@ -11,6 +11,21 @@ const error = msg => console.log(kleur.red(msg))
 
 const PROTECT = 'master'
 
+/* eslint-disable no-extend-native */
+Array.prototype.unique = function() {
+  return this.reduce((acc, curr) => {
+    const exists = acc.includes(curr)
+    if (!exists) {
+      acc.push(curr)
+    }
+    return acc
+  }, [])
+}
+
+Array.prototype.equals = function(anotherArray) {
+  return JSON.stringify(this) === JSON.stringify(anotherArray)
+}
+
 async function getCurrentBranch() {
   return execa('git', ['symbolic-ref', '--short', 'HEAD']).then(
     res => res.stdout
@@ -29,10 +44,8 @@ async function gitNotClean() {
     .catch(_ => true)
 }
 
-async function branchExists(name) {
-  return execa('git', ['show-ref', '--verify', '--quiet', `refs/heads/${name}`])
-    .then(_ => true)
-    .catch(_ => false)
+async function branchExists(branchListOptions) {
+  return getBranchList(branchListOptions).then(branches => branches.length > 0)
 }
 
 async function deleteTask(name) {
@@ -40,25 +53,45 @@ async function deleteTask(name) {
     error(`Branch ${name} is protected`)
     return
   }
-  return execa('git', ['branch', '-d', name]).catch(err => {
+  return execa('git', ['branch', '-D', name]).catch(err => {
     throw new Error(`Something went wrong deleting the branch\n${err.message}`)
   })
 }
 
 async function startTask(name, isNew = false) {
-  const args = isNew ? ['checkout', '-b', name] : ['checkout', name]
+  let trackArgs = []
+  const remotes = await getRemotesList()
+  if (!isNew) {
+    for (const remote of remotes) {
+      const possibleBranch = `remotes/${remote}/${name}`
+
+      if (await branchExists({ exact: possibleBranch, fullName: true })) {
+        trackArgs = ['--track', possibleBranch.replace('remotes/', '')]
+        break
+      }
+    }
+  }
+
+  const args = isNew
+    ? ['checkout', '-b', name]
+    : ['checkout', ...trackArgs, '-B', name]
 
   return execa('git', args).catch(err => {
     throw new Error(`Something went wrong creating the branch\n${err.message}`)
   })
 }
 
-async function getBranchList(fuzzy = '') {
+async function getBranchList({
+  fuzzy = '',
+  exact = '',
+  fullName = false
+} = {}) {
   const { stdout } = await execa('git', ['branch', '-a'])
   const branches = stdout
     .split('\n') // each line is a branch
+    .filter(b => b.includes(fuzzy)) // fuzzy search
     .map(b => b.replace(/^../, '')) // two first characters are not in the name
-    .map(b => (b.startsWith('remote') ? b.split('/').pop() : b))
+    .map(b => (!fullName && b.startsWith('remote') ? b.split('/').pop() : b))
     .reduce((acc, curr) => {
       // remove duplicates (caused by previous map)
       if (acc.includes(curr)) {
@@ -66,10 +99,17 @@ async function getBranchList(fuzzy = '') {
       }
       return [...acc, curr]
     }, [])
+    .filter(b => exact === '' || b === exact)
     .filter(Boolean) // remove '' when there are no branches
-    .filter(b => b.includes(fuzzy)) // fuzzy search
 
   return branches
+}
+
+async function getRemotesList() {
+  const { stdout } = await execa('git', ['remote', '-v'])
+  const remotes = stdout.split('\n').map(r => r.split('\t')[0])
+
+  return ['origin', ...remotes].unique()
 }
 
 const invalidSubstrings = [
@@ -91,17 +131,17 @@ const cantEndWithSubstrings = ['.', '/']
 const cantStartWithSubstrings = ['/']
 
 function isNameValid(name) {
-  for (let notAllowed of invalidSubstrings) {
+  for (const notAllowed of invalidSubstrings) {
     if (name.includes(notAllowed)) {
       return false
     }
   }
-  for (let notAllowed of cantEndWithSubstrings) {
+  for (const notAllowed of cantEndWithSubstrings) {
     if (name[name.length - 1] === notAllowed) {
       return false
     }
   }
-  for (let notAllowed of cantStartWithSubstrings) {
+  for (const notAllowed of cantStartWithSubstrings) {
     if (name.startsWith(notAllowed)) {
       return false
     }
@@ -110,7 +150,7 @@ function isNameValid(name) {
 }
 
 async function triggerTaskStart(name) {
-  const doesBranchExist = await branchExists(name)
+  const doesBranchExist = await branchExists({ exact: name })
   if (!isNameValid(name)) {
     error('Invalid name')
     return
@@ -118,7 +158,7 @@ async function triggerTaskStart(name) {
   await startTask(name, !doesBranchExist)
   remark(
     doesBranchExist
-      ? `Branch exists, checking out now...`
+      ? 'Branch exists, checking out now...'
       : `Created task ${name}`
   )
 }
@@ -158,17 +198,18 @@ async function cli(argv) {
 
       if (await gitNotClean()) {
         throw new Error(
-          `Please commit any changes in your repo before using this tool`
+          'Please commit any changes in your repo before using this tool'
         )
       }
 
-      const branches = await getBranchList(commands[0])
+      /* eslint-disable-next-line no-case-declarations */
+      const branches = await getBranchList({ fuzzy: commands[0] })
 
       if (commands[0] === 'delete') {
         if (commands[1]) {
           // delete specific
           const currentBranch = await getCurrentBranch()
-          if (await branchExists(commands[1])) {
+          if (await branchExists({ exact: commands[1] })) {
             if (currentBranch === commands[1]) {
               throw new Error(
                 `Can't delete branch ${currentBranch} if you're on it`
@@ -178,7 +219,7 @@ async function cli(argv) {
             remark(`Deleted branch ${commands[1]}`)
           } else {
             // search parameter and delete all matches
-            const matches = await getBranchList(commands[1])
+            const matches = await getBranchList({ fuzzy: commands[1] })
             if (matches.length === 0) {
               throw new Error(`No results for search: '${commands[1]}'`)
             }
@@ -198,7 +239,7 @@ async function cli(argv) {
               .then(({ 'Are you sure?': answer }) => {
                 if (answer === 'y') {
                   matches.forEach(deleteTask)
-                  remark(`Deleted`)
+                  remark('Deleted')
                 }
               })
           }
@@ -220,7 +261,7 @@ async function cli(argv) {
         break
       }
 
-      if (await branchExists(commands[0])) {
+      if (await branchExists({ exact: commands[0] })) {
         triggerTaskStart(commands[0])
         break
       }
