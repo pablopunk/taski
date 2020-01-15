@@ -82,14 +82,14 @@ async function startTask(name, isNew = false) {
 }
 
 async function getBranchList({
-  fuzzy = '',
-  exact = '',
+  fuzzy = null,
+  exact = null,
   fullName = false
 } = {}) {
   const { stdout } = await execa('git', ['branch', '-a'])
   const branches = stdout
     .split('\n') // each line is a branch
-    .filter(b => b.includes(fuzzy)) // fuzzy search
+    .filter(b => (fuzzy == null ? true : b.includes(fuzzy))) // fuzzy search
     .map(b => b.replace(/^../, '')) // two first characters are not in the name
     .map(b => (!fullName && b.startsWith('remote') ? b.split('/').pop() : b))
     .reduce((acc, curr) => {
@@ -99,8 +99,8 @@ async function getBranchList({
       }
       return [...acc, curr]
     }, [])
-    .filter(b => exact === '' || b === exact)
     .filter(Boolean) // remove '' when there are no branches
+    .filter(b => (exact == null ? true : b === exact))
 
   return branches
 }
@@ -261,7 +261,7 @@ async function cli(argv) {
         break
       }
 
-      if (await branchExists({ exact: commands[0] })) {
+      if (commands[0] && (await branchExists({ exact: commands[0] }))) {
         triggerTaskStart(commands[0])
         break
       }
