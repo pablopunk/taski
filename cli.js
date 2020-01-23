@@ -184,7 +184,7 @@ function help() {
       ${pkgName} MY_TASK
   List and choose from all tasks
       ${pkgName}
-  List tasks containing a string (starts task if no results)
+  List tasks containing a string. It will create a task if there are no results. The search is "smart case" (it will be case sensitive only if there are any uppercase letters in the search term).
       ${pkgName} MY
   Delete an existing task called 'foo' (or all containing foo - requires confirmation)
       ${pkgName} delete foo
