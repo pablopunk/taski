@@ -26,6 +26,20 @@ Array.prototype.equals = function(anotherArray) {
   return JSON.stringify(this) === JSON.stringify(anotherArray)
 }
 
+String.prototype.fuzzy = function(term) {
+  if (term.hasUpperCase()) {
+    // case sensitive search
+    return new RegExp(term).test(this)
+  }
+
+  // case insensitive search
+  return new RegExp(term, 'i').test(this)
+}
+
+String.prototype.hasUpperCase = function() {
+  return /[A-Z]/.test(this)
+}
+
 async function getCurrentBranch() {
   return execa('git', ['symbolic-ref', '--short', 'HEAD']).then(
     res => res.stdout
@@ -89,7 +103,7 @@ async function getBranchList({
   const { stdout } = await execa('git', ['branch', '-a'])
   const branches = stdout
     .split('\n') // each line is a branch
-    .filter(b => (fuzzy == null ? true : b.includes(fuzzy))) // fuzzy search
+    .filter(b => (fuzzy == null ? true : b.fuzzy(fuzzy))) // fuzzy search
     .map(b => b.replace(/^../, '')) // two first characters are not in the name
     .map(b => (!fullName && b.startsWith('remote') ? b.split('/').pop() : b))
     .reduce((acc, curr) => {
