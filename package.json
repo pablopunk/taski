@@ -34,9 +34,9 @@
     "cli"
   ],
   "license": "MIT",
-  "main": "cli.js",
+  "main": "src/cli.js",
   "bin": {
-    "taski": "cli.js"
+    "taski": "src/cli.js"
   },
   "repository": {
     "type": "git",
