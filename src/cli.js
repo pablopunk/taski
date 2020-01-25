@@ -17,7 +17,15 @@ const {
 
 const info = console.log
 const remark = msg => console.log(kleur.green(msg))
-const error = msg => console.log(kleur.red(msg))
+const error = err => {
+  let msg = err
+
+  if (typeof err === 'object' && typeof err.message === 'string') {
+    msg = err.message
+  }
+
+  console.log(kleur.red(msg))
+}
 
 const PROTECT = 'master'
 
@@ -160,7 +168,7 @@ async function askUserToStartTask(commands) {
   }
 }
 
-async function chooseAnExsistingBranch(branches) {
+async function chooseAnExsistingBranch(branches, commands) {
   inquirer
     .prompt({
       name: 'Choose task',
@@ -169,7 +177,7 @@ async function chooseAnExsistingBranch(branches) {
     })
     .then(({ 'Choose task': answer }) => {
       if (answer === 'Create new task') {
-        info(`Create new task with '${pkgName} <task-name>'`)
+        triggerTaskStart(commands[0])
       } else {
         triggerTaskStart(answer)
       }
@@ -203,7 +211,7 @@ async function cli(argv) {
       const branches = await getBranchList({ fuzzy: commands[0] })
 
       if (commands[0] === 'delete') {
-        triggerTaskDelete(commands)
+        triggerTaskDelete(commands).catch(error)
         break
       }
 
@@ -217,10 +225,10 @@ async function cli(argv) {
         break // never continue
       }
 
-      chooseAnExsistingBranch(branches)
+      chooseAnExsistingBranch(branches, commands)
 
       break
   }
 }
 
-cli(process.argv.slice(2)).catch(err => error(err.message))
+cli(process.argv.slice(2)).catch(error)
