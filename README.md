@@ -9,7 +9,9 @@
   <i>Simplify your git workflow with tasks</i>
 </p>
 
-![logo](./res/taski.svg)
+<p align="center">
+  <img src="./res/taski.svg" alt="logo" width="300"/>
+</p>
 
 <p align="center">
   <a href="https://asciinema.org/a/YArtoa00PICWDPYq1DQXMX4zp" target="_blank"><img src="https://asciinema.org/a/YArtoa00PICWDPYq1DQXMX4zp.svg" /></a>
