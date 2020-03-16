@@ -1,7 +1,7 @@
 {
   "name": "taski",
   "description": "Simplify your git workflow with tasks",
-  "version": "4.1.4",
+  "version": "4.1.5",
   "author": "Pablo Varela <pablovarela182@gmail.com>",
   "bugs": {
     "url": "https://github.com/pablopunk/taski/issues",
