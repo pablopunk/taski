@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="./res/taski.svg" alt="logo" width="300"/>
+  <img src="https://raw.githubusercontent.com/pablopunk/taski/master/res/taski.svg?sanitize=true" alt="logo" width="300"/>
 </p>
 
 <p align="center">
