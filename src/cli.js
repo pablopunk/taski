@@ -14,6 +14,7 @@ const {
   notGit,
   startTask
 } = require('./git')
+const { isNameValid } = require('./utils.js')
 
 const info = console.log
 const remark = msg => console.log(kleur.green(msg))
@@ -37,43 +38,6 @@ async function deleteTask(name) {
   return execa('git', ['branch', '-D', name]).catch(err => {
     throw new Error(`Something went wrong deleting the branch\n${err.message}`)
   })
-}
-
-const invalidSubstrings = [
-  '..',
-  ' ',
-  '~',
-  '^',
-  ':',
-  '?',
-  '*',
-  '[',
-  '//',
-  '@{',
-  '\\'
-]
-
-const cantEndWithSubstrings = ['.', '/']
-
-const cantStartWithSubstrings = ['/']
-
-function isNameValid(name) {
-  for (const notAllowed of invalidSubstrings) {
-    if (name.includes(notAllowed)) {
-      return false
-    }
-  }
-  for (const notAllowed of cantEndWithSubstrings) {
-    if (name[name.length - 1] === notAllowed) {
-      return false
-    }
-  }
-  for (const notAllowed of cantStartWithSubstrings) {
-    if (name.startsWith(notAllowed)) {
-      return false
-    }
-  }
-  return true
 }
 
 async function triggerTaskStart(name) {

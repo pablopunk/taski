@@ -22,17 +22,17 @@ async function branchExists(branchListOptions) {
   return getBranchList(branchListOptions).then(branches => branches.length > 0)
 }
 
-async function getBranchList({
-  fuzzy = null,
-  exact = null,
-  fullName = false
-} = {}) {
-  const { stdout } = await execa('git', ['branch', '-a'])
-  const branches = stdout
+function normalizeBranchesFromOutput(stdout, { fuzzy, fullName, exact }) {
+  return stdout
     .split('\n') // each line is a branch
     .filter(b => (fuzzy == null ? true : b.fuzzy(fuzzy))) // fuzzy search
     .map(b => b.replace(/^../, '')) // two first characters are not in the name
-    .map(b => (!fullName && b.startsWith('remote') ? b.split('/').pop() : b))
+    .filter(b => !b.includes('HEAD -> ')) // remove HEAD
+    .map(b =>
+      !fullName && b.startsWith('remote')
+        ? b.replace(/remotes\/[^\/]*\//, '')
+        : b
+    )
     .reduce((acc, curr) => {
       // remove duplicates (caused by previous map)
       if (acc.includes(curr)) {
@@ -42,6 +42,19 @@ async function getBranchList({
     }, [])
     .filter(Boolean) // remove '' when there are no branches
     .filter(b => (exact == null ? true : b === exact))
+}
+
+async function getBranchList({
+  fuzzy = null,
+  exact = null,
+  fullName = false
+} = {}) {
+  const { stdout } = await execa('git', ['branch', '-a'])
+  const branches = normalizeBranchesFromOutput(stdout, {
+    fuzzy,
+    exact,
+    fullName
+  })
 
   return branches
 }
@@ -82,5 +95,6 @@ module.exports = {
   getCurrentBranch,
   gitNotClean,
   notGit,
-  startTask
+  startTask,
+  normalizeBranchesFromOutput
 }

@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "husky": "*",
+    "myass": "^1.4.0",
     "prettier": "*",
     "pretty-quick": "*"
   },
@@ -42,7 +43,9 @@
     "type": "git",
     "url": "https://github.com/pablopunk/taski"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "myass"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged"
