@@ -25,14 +25,14 @@ async function branchExists(branchListOptions) {
 function normalizeBranchesFromOutput(stdout, { fuzzy, fullName, exact }) {
   return stdout
     .split('\n') // each line is a branch
-    .filter(b => (fuzzy == null ? true : b.fuzzy(fuzzy))) // fuzzy search
     .map(b => b.replace(/^../, '')) // two first characters are not in the name
-    .filter(b => !b.includes('HEAD -> ')) // remove HEAD
     .map(b =>
       !fullName && b.startsWith('remote')
         ? b.replace(/remotes\/[^\/]*\//, '')
         : b
     )
+    .filter(b => (fuzzy == null ? true : b.fuzzy(fuzzy))) // fuzzy search
+    .filter(b => !b.includes('HEAD -> ')) // remove HEAD
     .reduce((acc, curr) => {
       // remove duplicates (caused by previous map)
       if (acc.includes(curr)) {

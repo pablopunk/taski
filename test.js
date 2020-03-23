@@ -1,6 +1,7 @@
 const test = require('myass')
 const { isNameValid } = require('./src/utils')
 const { normalizeBranchesFromOutput } = require('./src/git')
+require('./src/overrides')
 
 test('Valid/Invalid names', async t => {
   t.true(isNameValid('foo'))
@@ -39,4 +40,23 @@ test('You can have names like release/2.0', async t => {
   `
   const branches = normalizeBranchesFromOutput(stdout, {})
   t.is(branches, ['master', 'release/2.0'])
+})
+
+test('Do not search in remote name', async t => {
+  const stdout = `
+* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/upstream/release/2.0
+  `
+  const branchesWithRemotes = normalizeBranchesFromOutput(stdout, {
+    fuzzy: 'up',
+    fullName: true
+  })
+  t.is(branchesWithRemotes, ['remotes/upstream/release/2.0'])
+
+  const branchesWithouRemotes = normalizeBranchesFromOutput(stdout, {
+    fuzzy: 'up'
+  })
+  t.is(branchesWithouRemotes, [])
 })
