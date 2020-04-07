@@ -18,6 +18,7 @@ const { isNameValid } = require('./utils.js')
 
 const info = console.log
 const remark = msg => console.log(kleur.green(msg))
+const logred = msg => console.log(kleur.red(msg))
 const error = err => {
   let msg = err
 
@@ -90,7 +91,7 @@ async function triggerTaskDelete(commands) {
         throw new Error(`Can't delete branch ${currentBranch} if you're on it`)
       }
       info('Will be deleting the following branches:')
-      remark(matches.join('\n'))
+      logred(matches.join('\n'))
       inquirer // ask for confirmation
         .prompt({
           name: 'Are you sure?',
