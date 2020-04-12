@@ -12,14 +12,14 @@ const {
   getCurrentBranch,
   gitNotClean,
   notGit,
-  startTask
+  startTask,
 } = require('./git')
 const { isNameValid } = require('./utils.js')
 
 const info = console.log
-const remark = msg => console.log(kleur.green(msg))
-const logred = msg => console.log(kleur.red(msg))
-const error = err => {
+const remark = (msg) => console.log(kleur.green(msg))
+const logred = (msg) => console.log(kleur.red(msg))
+const error = (err) => {
   let msg = err
 
   if (typeof err === 'object' && typeof err.message === 'string') {
@@ -36,7 +36,7 @@ async function deleteTask(name) {
     error(`Branch ${name} is protected`)
     return
   }
-  return execa('git', ['branch', '-D', name]).catch(err => {
+  return execa('git', ['branch', '-D', name]).catch((err) => {
     throw new Error(`Something went wrong deleting the branch\n${err.message}`)
   })
 }
@@ -96,7 +96,7 @@ async function triggerTaskDelete(commands) {
         .prompt({
           name: 'Are you sure?',
           type: 'list',
-          choices: ['y', 'n']
+          choices: ['y', 'n'],
         })
         .then(({ 'Are you sure?': answer }) => {
           if (answer === 'y') {
@@ -113,7 +113,7 @@ async function triggerTaskDelete(commands) {
       .prompt({
         name: 'Choose branch to delete',
         type: 'list',
-        choices: allBranches
+        choices: allBranches,
       })
       .then(({ 'Choose branch to delete': answer }) => {
         deleteTask(answer)
@@ -126,7 +126,7 @@ async function askUserToStartTask(commands) {
   const { [question]: answer } = await inquirer.prompt({
     name: question,
     type: 'list',
-    choices: ['y', 'n']
+    choices: ['y', 'n'],
   })
   if (answer === 'y') {
     triggerTaskStart(commands[0])
@@ -138,7 +138,7 @@ async function chooseAnExsistingBranch(branches, commands) {
     .prompt({
       name: 'Choose task',
       type: 'list',
-      choices: [...branches, new inquirer.Separator(), 'Create new task']
+      choices: [...branches, new inquirer.Separator(), 'Create new task'],
     })
     .then(({ 'Choose task': answer }) => {
       if (answer === 'Create new task') {
@@ -168,7 +168,7 @@ async function cli(argv) {
 
       if (await gitNotClean()) {
         throw new Error(
-          'Please commit any changes in your repo before using this tool'
+          'Please commit/push any changes on this branch before using this tool'
         )
       }
 
