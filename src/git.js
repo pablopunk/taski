@@ -17,8 +17,8 @@ async function gitNotClean() {
     .then(({ stdout }) => {
       return stdout.length !== 0 // clean stdout means git is clean
     })
-    .then((passed) => {
-      if (!passed) {
+    .then((notClean) => {
+      if (notClean) {
         return true
       }
 
